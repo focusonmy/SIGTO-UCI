@@ -136,8 +136,8 @@ export default function Login() {
           <svg className="w-24 h-24 mx-auto mb-6 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
-          <h2 className="text-3xl font-bold mb-4">Sistema de Transporte Universitario</h2>
-          <p className="text-lg opacity-80">Gestiona rutas, itinerarios y unidades de transporte para tu universidad</p>
+          <h2 className="text-3xl font-bold mb-4">Gestión de Transporte Obrero UCI</h2>
+          <p className="text-lg opacity-80">Administra rutas, asigna ómnibus y choferes, y consulta el estado del transporte en tiempo real para los trabajadores de la Universidad de las Ciencias Informáticas.</p>
         </div>
       </div>
     </div>
