@@ -40,11 +40,9 @@ describe('Login', () => {
     const user = screen.getByPlaceholderText('Ingresa tu usuario')
     const pass = screen.getByPlaceholderText('••••••••')
     fireEvent.change(user, { target: { value: 'admin' } })
-    fireEvent.change(pass, { target: { value: 'Admin123!' } })
+    fireEvent.change(pass, { target: { value: 'password' } })
     fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }))
-    await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith('admin', 'Admin123!')
-    })
+    expect(mockLogin).toHaveBeenCalledWith('admin', 'password')
   })
 
   it('no llama login sin campos', () => {

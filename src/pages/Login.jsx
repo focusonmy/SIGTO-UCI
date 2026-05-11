@@ -123,19 +123,7 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-8 p-4 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-sm font-medium mb-3" style={{ color: '#94a3b8' }}>Cuentas de prueba:</p>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <span style={{ color: '#cbd5e1' }}>Administrador</span>
-                <code className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(37,99,235,0.15)', color: '#60a5fa' }}>admin / admin123</code>
-              </div>
-              <div className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <span style={{ color: '#cbd5e1' }}>Conductor</span>
-                <code className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>conductor1 / conductor123</code>
-              </div>
-            </div>
-          </div>
+          
 
           <a href="/" className="block mt-6 text-center text-sm transition-colors hover:text-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400" style={{ color: '#64748b' }}>
             ← Volver al inicio
