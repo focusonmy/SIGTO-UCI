@@ -1,0 +1,8 @@
+process.env.JWT_SECRET = 'test-secret-key-123456789012345678901234567890'
+process.env.NODE_ENV = 'test'
+process.env.DB_NAME = 'test_db'
+process.env.DB_USERNAME = 'postgres'
+process.env.DB_PASSWORD = 'test'
+process.env.DB_HOST = 'localhost'
+process.env.DB_PORT = '5432'
+process.env.PORT = '3001'
