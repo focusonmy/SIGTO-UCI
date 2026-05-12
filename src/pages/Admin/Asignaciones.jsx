@@ -37,6 +37,7 @@ export default function Asignaciones() {
   const [choferes, setChoferes] = useState([])
   const [omnibus, setOmnibus] = useState([])
   const [loading, setLoading] = useState(false)
+  const [sortAsc, setSortAsc] = useState(null)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' })
   const [errorFecha, setErrorFecha] = useState('')
@@ -304,24 +305,40 @@ export default function Asignaciones() {
         </div>
       </div>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium mb-2" style={{ color: '#374151' }}>Fecha</label>
-        <input
-          type="date"
-          value={fecha || ''}
-          onChange={e => setFecha(e.target.value)}
-          min={primerDiaValido || ''}
-          max={diasValidos[diasValidos.length - 1] || ''}
-          className="px-4 py-2 rounded-lg"
-          style={{ border: errorFecha ? '1px solid #ef4444' : '1px solid #e2e8f0' }}
-        />
-        {errorFecha ? (
-          <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{errorFecha}</p>
-        ) : (
-          <p className="text-xs mt-1" style={{ color: '#64748b' }}>
-            Solo se pueden asignar rutas para dias laborables (lunes a viernes)
-          </p>
-        )}
+      <div className="mb-4 flex items-center gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium mb-2" style={{ color: '#374151' }}>Fecha</label>
+          <input
+            type="date"
+            value={fecha || ''}
+            onChange={e => setFecha(e.target.value)}
+            min={primerDiaValido || ''}
+            max={diasValidos[diasValidos.length - 1] || ''}
+            className="px-4 py-2 rounded-lg"
+            style={{ border: errorFecha ? '1px solid #ef4444' : '1px solid #e2e8f0' }}
+          />
+          {errorFecha ? (
+            <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{errorFecha}</p>
+          ) : (
+            <p className="text-xs mt-1" style={{ color: '#64748b' }}>
+              Solo se pueden asignar rutas para dias laborables (lunes a viernes)
+            </p>
+          )}
+        </div>
+        <div className="flex items-end">
+          <button
+            onClick={() => setSortAsc(prev => prev === null ? true : prev ? false : null)}
+            title="Ordenar rutas alfabéticamente"
+            className="px-3 py-2 rounded-lg text-sm font-medium mb-2"
+            style={{
+              border: '1px solid #e2e8f0',
+              color: sortAsc !== null ? '#2563eb' : '#64748b',
+              background: sortAsc !== null ? 'rgba(37, 99, 235, 0.05)' : 'transparent'
+            }}
+          >
+            {sortAsc === null ? 'A-Z ↕' : sortAsc ? 'A-Z ↑' : 'Z-A ↓'}
+          </button>
+        </div>
       </div>
 
       {errorFecha ? (
@@ -347,8 +364,11 @@ export default function Asignaciones() {
                     const asigB = getAsignacion(b.id, hora)
                     const exA = asigA?.excluded === true
                     const exB = asigB?.excluded === true
-                    if (exA === exB) return 0
-                    return exA ? 1 : -1
+                    if (exA !== exB) return exA ? 1 : -1
+                    if (sortAsc === null) return 0
+                    return sortAsc
+                      ? (a.nombre || '').localeCompare(b.nombre || '')
+                      : (b.nombre || '').localeCompare(a.nombre || '')
                   })
                   .map(ruta => renderSlot(ruta, hora))}
               </div>

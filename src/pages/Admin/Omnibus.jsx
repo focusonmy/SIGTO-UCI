@@ -38,6 +38,7 @@ export default function Omnibus() {
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(initialForm)
   const [search, setSearch] = useState('')
+  const [sortAsc, setSortAsc] = useState(null)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
@@ -124,10 +125,17 @@ export default function Omnibus() {
     return colors[estado] || colors.disponible
   }
 
-  const filtered = omnibus.filter(o =>
+  let filtered = omnibus.filter(o =>
     (o.placa || '').toLowerCase().includes(search.toLowerCase()) ||
     (o.marca || '').toLowerCase().includes(search.toLowerCase())
   )
+  if (sortAsc !== null) {
+    filtered = [...filtered].sort((a, b) =>
+      sortAsc
+        ? (a.placa || '').localeCompare(b.placa || '')
+        : (b.placa || '').localeCompare(a.placa || '')
+    )
+  }
 
   return (
     <div>
@@ -142,7 +150,7 @@ export default function Omnibus() {
         </button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <input
           type="text"
           placeholder="Buscar ómnibus..."
@@ -151,6 +159,18 @@ export default function Omnibus() {
           className="flex-1 max-w-xs px-4 py-2 rounded-lg"
           style={{ border: '1px solid #e2e8f0' }}
         />
+        <button
+          onClick={() => setSortAsc(prev => prev === null ? true : prev ? false : null)}
+          title="Ordenar alfabéticamente"
+          className="px-3 py-2 rounded-lg text-sm font-medium"
+          style={{
+            border: '1px solid #e2e8f0',
+            color: sortAsc !== null ? '#2563eb' : '#64748b',
+            background: sortAsc !== null ? 'rgba(37, 99, 235, 0.05)' : 'transparent'
+          }}
+        >
+          {sortAsc === null ? 'A-Z ↕' : sortAsc ? 'A-Z ↑' : 'Z-A ↓'}
+        </button>
       </div>
 
       <div className="rounded-2xl overflow-hidden" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>

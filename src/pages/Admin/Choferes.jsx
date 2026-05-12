@@ -82,6 +82,7 @@ export default function Choferes() {
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(initialForm)
   const [search, setSearch] = useState('')
+  const [sortAsc, setSortAsc] = useState(null)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
@@ -181,10 +182,17 @@ export default function Choferes() {
     setDeleteModal({ open: true, id: chofer.id, nombre: chofer.nombre })
   }
 
-  const filtered = choferes.filter(c => 
+  let filtered = [...choferes].filter(c =>
     c.nombre?.toLowerCase().includes(search.toLowerCase()) ||
     c.cedula?.toLowerCase().includes(search.toLowerCase())
   )
+  if (sortAsc !== null) {
+    filtered = filtered.sort((a, b) =>
+      sortAsc
+        ? (a.nombre || '').localeCompare(b.nombre || '')
+        : (b.nombre || '').localeCompare(a.nombre || '')
+    )
+  }
 
   return (
     <div>
@@ -198,7 +206,7 @@ export default function Choferes() {
         </button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <input
           type="text"
           placeholder="Buscar choferes..."
@@ -207,6 +215,18 @@ export default function Choferes() {
           className="input-field"
           style={{ maxWidth: '320px' }}
         />
+        <button
+          onClick={() => setSortAsc(prev => prev === null ? true : prev ? false : null)}
+          title="Ordenar alfabéticamente"
+          className="px-3 py-2 rounded-lg text-sm font-medium"
+          style={{
+            border: '1px solid #e2e8f0',
+            color: sortAsc !== null ? '#2563eb' : '#64748b',
+            background: sortAsc !== null ? 'rgba(37, 99, 235, 0.05)' : 'transparent'
+          }}
+        >
+          {sortAsc === null ? 'A-Z ↕' : sortAsc ? 'A-Z ↑' : 'Z-A ↓'}
+        </button>
       </div>
 
       {/* Grid de tarjetas para móvil */}

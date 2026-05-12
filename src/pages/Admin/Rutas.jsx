@@ -34,6 +34,7 @@ export default function Rutas() {
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(initialForm)
   const [search, setSearch] = useState('')
+  const [sortAsc, setSortAsc] = useState(null)
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
@@ -125,10 +126,17 @@ export default function Rutas() {
     setDeleteModal({ open: true, id: ruta.id, nombre: ruta.nombre })
   }
 
-  const filteredRutas = rutas.filter(r =>
+  let filteredRutas = rutas.filter(r =>
     (r.nombre || '').toLowerCase().includes(search.toLowerCase()) ||
     (r.origen || '').toLowerCase().includes(search.toLowerCase())
   )
+  if (sortAsc !== null) {
+    filteredRutas = [...filteredRutas].sort((a, b) =>
+      sortAsc
+        ? (a.nombre || '').localeCompare(b.nombre || '')
+        : (b.nombre || '').localeCompare(a.nombre || '')
+    )
+  }
 
   return (
     <div>
@@ -152,6 +160,18 @@ export default function Rutas() {
           className="flex-1 max-w-xs px-4 py-2 rounded-lg"
           style={{ border: '1px solid #e2e8f0' }}
         />
+        <button
+          onClick={() => setSortAsc(prev => prev === null ? true : prev ? false : null)}
+          title="Ordenar alfabéticamente"
+          className="px-3 py-2 rounded-lg text-sm font-medium"
+          style={{
+            border: '1px solid #e2e8f0',
+            color: sortAsc !== null ? '#2563eb' : '#64748b',
+            background: sortAsc !== null ? 'rgba(37, 99, 235, 0.05)' : 'transparent'
+          }}
+        >
+          {sortAsc === null ? 'A-Z ↕' : sortAsc ? 'A-Z ↑' : 'Z-A ↓'}
+        </button>
       </div>
 
       <div className="rounded-2xl overflow-hidden" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
