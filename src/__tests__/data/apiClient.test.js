@@ -16,7 +16,7 @@ beforeEach(() => {
   })
 })
 
-import { auth, rutas, choferes, omnibus, asignaciones } from '../../data/apiClient.js'
+import { auth, rutas, choferes, omnibus, asignaciones, STORAGE_KEYS } from '../../data/apiClient.js'
 
 describe('apiClient - auth', () => {
   describe('login', () => {
@@ -27,7 +27,7 @@ describe('apiClient - auth', () => {
         text: () => Promise.resolve(JSON.stringify({ user: { id: '1', username: 'admin', role: 'admin', nombre: 'Admin' }, token: 'jwt-token-123' })),
       })
       const result = await auth.login('admin', 'Admin123!')
-      expect(localStorage.setItem).toHaveBeenCalledWith('token', 'jwt-token-123')
+      expect(localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEYS.token, 'jwt-token-123')
       expect(result.token).toBe('jwt-token-123')
     })
 
@@ -43,7 +43,7 @@ describe('apiClient - auth', () => {
 
     it('agrega Authorization header con token existente', async () => {
       localStorage.getItem.mockImplementation((key) => {
-        if (key === 'token') return 'existing-token'
+        if (key === STORAGE_KEYS.token) return 'existing-token'
         return null
       })
       mockFetch.mockResolvedValueOnce({
@@ -64,8 +64,8 @@ describe('apiClient - auth', () => {
   describe('logout', () => {
     it('elimina token y user de localStorage', () => {
       auth.logout()
-      expect(localStorage.removeItem).toHaveBeenCalledWith('token')
-      expect(localStorage.removeItem).toHaveBeenCalledWith('user')
+      expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.token)
+      expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.user)
     })
   })
 })
@@ -95,8 +95,8 @@ describe('apiClient - request', () => {
       json: () => Promise.resolve({ error: 'Token expirado' }),
     })
     await expect(rutas.getAll()).rejects.toThrow('Sesión expirada')
-    expect(localStorage.removeItem).toHaveBeenCalledWith('token')
-    expect(localStorage.removeItem).toHaveBeenCalledWith('user')
+    expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.token)
+    expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEYS.user)
   })
 
   it('lanza error cuando servidor no responde (TypeError)', async () => {

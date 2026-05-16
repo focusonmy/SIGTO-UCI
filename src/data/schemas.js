@@ -1,5 +1,0 @@
-export const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']
-export const horasSalida = ['06:45', '17:15']
-export const estadosRuta = ['programada', 'en_curso', 'completada', 'cancelada']
-export const estadosOmnibus = ['disponible', 'en_servicio', 'mantenimiento']
-export const tiposOmnibus = ['estandar', 'articulado']

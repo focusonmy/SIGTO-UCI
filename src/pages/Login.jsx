@@ -78,7 +78,6 @@ export default function Login() {
                 placeholder="Ingresa tu usuario"
                 spellCheck={false}
                 required
-                autoFocus
               />
             </div>
 

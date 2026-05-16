@@ -1,0 +1,56 @@
+# Validación de fechas para asignación de rutas
+
+## Regla de negocio
+
+El servicio de transporte opera **únicamente de lunes a viernes** (días laborables).  
+No hay servicio los sábados ni domingos.
+
+Sin embargo, **las asignaciones de rutas pueden crearse o modificarse cualquier día de la semana**, incluyendo sábados y domingos.  
+La restricción aplica sobre la **fecha de la ruta** (el día en que se prestará el servicio), no sobre la fecha actual.
+
+## Condiciones para permitir una asignación
+
+Una asignación (chofer + ómnibus + ruta + fecha + horario) es válida **si y solo si**:
+
+1. La fecha de la ruta **no es sábado ni domingo**.
+2. La fecha de la ruta es **igual a hoy** (si hoy es laborable) o **dentro de los próximos 2 días laborables** (contando solo lunes a viernes, saltando fines de semana).
+3. No se permiten fechas pasadas.
+
+## Casos de uso (ejemplos)
+
+| Hoy (fecha actual) | Fecha de ruta solicitada | ¿Permitido? | Motivo |
+|--------------------|--------------------------|-------------|--------|
+| Lunes              | Lunes (hoy)              | ✅ Sí       | Hoy laborable |
+| Lunes              | Martes                   | ✅ Sí       | 1 día laborable |
+| Lunes              | Miércoles                | ✅ Sí       | 2 días laborables |
+| Lunes              | Jueves                   | ❌ No       | 3er día laborable |
+| Viernes            | Lunes                    | ✅ Sí       | Sáb/dom no cuentan; lunes = 1er día |
+| Viernes            | Martes                   | ✅ Sí       | 2do día laborable |
+| Viernes            | Miércoles                | ❌ No       | 3er día |
+| Sábado             | Lunes                    | ✅ Sí       | Se programa desde sábado |
+| Sábado             | Martes                   | ✅ Sí       | 2 días laborables |
+| Sábado             | Miércoles                | ❌ No       | 3er día |
+| Domingo            | Lunes                    | ✅ Sí       | Se programa desde domingo |
+| Sábado             | Sábado                   | ❌ No       | Fecha de ruta en fin de semana |
+| Viernes            | Sábado                   | ❌ No       | Fecha de ruta en fin de semana |
+
+## Errores comunes a evitar
+
+- **No validar que `hoy` sea fin de semana** para bloquear la creación. La validación solo debe aplicarse sobre la **fecha seleccionada** para la ruta.
+- **No contar los fines de semana como días hábiles** en el horizonte de 2 días. Solo cuentan lunes a viernes.
+- **No permitir fechas anteriores a hoy**, incluso si son laborables.
+
+## Resumen para implementación
+
+En el backend (endpoint `POST /asignaciones`), validar:
+
+1. `fechaRuta` no es sábado (6) ni domingo (0).
+2. `fechaRuta` >= hoy.
+3. `fechaRuta` está dentro del horizonte: desde hoy (si es laborable) hasta el 2º día laborable futuro, saltando fines de semana.
+
+En el frontend, deshabilitar en el selector de fechas:
+- Sábados y domingos.
+- Fechas anteriores a hoy.
+- Fechas más allá del 2º día laborable futuro.
+
+La acción de crear/asignar debe estar permitida **incluso si hoy es sábado o domingo**, siempre que la fecha de ruta cumpla las condiciones.

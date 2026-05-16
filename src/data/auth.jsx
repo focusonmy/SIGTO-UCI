@@ -1,12 +1,12 @@
 import { createContext, useState, useContext, useEffect } from 'react'
-import { auth } from './apiClient'
+import { auth, STORAGE_KEYS } from './apiClient'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user')
-    const token = localStorage.getItem('token')
+    const stored = localStorage.getItem(STORAGE_KEYS.user)
+    const token = localStorage.getItem(STORAGE_KEYS.token)
     if (stored && token) {
       try {
         const parsed = JSON.parse(stored)
@@ -14,8 +14,8 @@ export function AuthProvider({ children }) {
           return parsed
         }
       } catch {
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
+        localStorage.removeItem(STORAGE_KEYS.user)
+        localStorage.removeItem(STORAGE_KEYS.token)
       }
     }
     return null
@@ -23,8 +23,8 @@ export function AuthProvider({ children }) {
   const [loading] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('user')
-    const token = localStorage.getItem('token')
+    const stored = localStorage.getItem(STORAGE_KEYS.user)
+    const token = localStorage.getItem(STORAGE_KEYS.token)
     if (stored && token) {
       try {
         const parsed = JSON.parse(stored)
@@ -32,8 +32,8 @@ export function AuthProvider({ children }) {
           setUser(parsed)
         }
       } catch {
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
+        localStorage.removeItem(STORAGE_KEYS.user)
+        localStorage.removeItem(STORAGE_KEYS.token)
       }
     }
   }, [])
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
       if (data.user && data.token) {
         const { password: _, ...userData } = data.user
         setUser(userData)
-        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(userData))
         return { success: true, role: data.user.role }
       }
       return { success: false }

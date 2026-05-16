@@ -279,7 +279,7 @@ export default function Choferes() {
                   type="text"
                   inputMode="numeric"
                   value={form.cedula}
-                  onChange={e => setForm({ ...form, cedula: e.target.value.replace(/\D/g, '') })}
+                  onChange={e => setForm(prev => ({ ...prev, cedula: e.target.value.replace(/\D/g, '') }))}
                   className="input-field"
                   autoComplete="off"
                   spellCheck={false}
@@ -293,7 +293,7 @@ export default function Choferes() {
                   name="nombre"
                   type="text"
                   value={form.nombre}
-                  onChange={e => setForm({ ...form, nombre: e.target.value })}
+                  onChange={e => setForm(prev => ({ ...prev, nombre: e.target.value }))}
                   className="input-field"
                   autoComplete="name"
                 />
@@ -307,7 +307,7 @@ export default function Choferes() {
                   type="tel"
                   inputMode="numeric"
                   value={form.telefono}
-                  onChange={e => setForm({ ...form, telefono: e.target.value.replace(/\D/g, '') })}
+                  onChange={e => setForm(prev => ({ ...prev, telefono: e.target.value.replace(/\D/g, '') }))}
                   className="input-field"
                   maxLength={8}
                   placeholder="Ej: 51234567"
@@ -322,7 +322,7 @@ export default function Choferes() {
                   name="license"
                   type="text"
                   value={form.licencia}
-                  onChange={e => setForm({ ...form, licencia: e.target.value })}
+                  onChange={e => setForm(prev => ({ ...prev, licencia: e.target.value }))}
                   className="input-field"
                   autoComplete="off"
                 />
@@ -335,7 +335,7 @@ export default function Choferes() {
                   name="license-expires"
                   type="date"
                   value={form.fecha_venc_licencia}
-                  onChange={e => setForm({ ...form, fecha_venc_licencia: e.target.value })}
+                  onChange={e => setForm(prev => ({ ...prev, fecha_venc_licencia: e.target.value }))}
                   className="input-field"
                 />
                 {errors.fecha_venc_licencia && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.fecha_venc_licencia}</p>}
@@ -352,7 +352,7 @@ export default function Choferes() {
                       name="username"
                       type="text"
                       value={form.username}
-                      onChange={e => setForm({ ...form, username: e.target.value })}
+                      onChange={e => setForm(prev => ({ ...prev, username: e.target.value }))}
                       className="input-field"
                       autoComplete="off"
                       placeholder={editingId ? 'Dejar vacío para no cambiar' : 'Nombre de usuario'}
@@ -369,7 +369,7 @@ export default function Choferes() {
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         value={form.password}
-                        onChange={e => setForm({ ...form, password: e.target.value })}
+                        onChange={e => setForm(prev => ({ ...prev, password: e.target.value }))}
                         className="input-field"
                         style={{ paddingRight: '40px' }}
                         autoComplete="new-password"
@@ -413,7 +413,7 @@ export default function Choferes() {
                   id="observacion"
                   name="observacion"
                   value={form.observacion}
-                  onChange={e => setForm({ ...form, observacion: e.target.value })}
+                  onChange={e => setForm(prev => ({ ...prev, observacion: e.target.value }))}
                   className="input-field"
                   rows={3}
                 />

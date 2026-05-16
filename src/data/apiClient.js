@@ -1,11 +1,19 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
+export const STORAGE_KEYS = {
+  token: 'token:v1',
+  user: 'user:v1',
+}
+
+let _tokenCache = localStorage.getItem(STORAGE_KEYS.token) || null
+
 async function request(endpoint, options = {}) {
-  const token = localStorage.getItem('token')
-  
+  if (!_tokenCache) {
+    _tokenCache = localStorage.getItem(STORAGE_KEYS.token)
+  }
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(_tokenCache && { Authorization: `Bearer ${_tokenCache}` }),
     ...options.headers
   }
 
@@ -16,8 +24,9 @@ async function request(endpoint, options = {}) {
     })
 
     if (response.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      _tokenCache = null
+      localStorage.removeItem(STORAGE_KEYS.token)
+      localStorage.removeItem(STORAGE_KEYS.user)
       window.location.href = '/login'
       throw new Error('Sesión expirada')
     }
@@ -45,7 +54,8 @@ export const auth = {
         body: JSON.stringify({ username, password })
       })
       if (data.token) {
-        localStorage.setItem('token', data.token)
+        _tokenCache = data.token
+        localStorage.setItem(STORAGE_KEYS.token, data.token)
       }
       return data
     } catch (error) {
@@ -54,13 +64,16 @@ export const auth = {
   },
 
   logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    _tokenCache = null
+    localStorage.removeItem(STORAGE_KEYS.token)
+    localStorage.removeItem(STORAGE_KEYS.user)
   },
 
   async verify() {
-    const token = localStorage.getItem('token')
-    if (!token) return { valid: false }
+    if (!_tokenCache) {
+      _tokenCache = localStorage.getItem(STORAGE_KEYS.token)
+    }
+    if (!_tokenCache) return { valid: false }
     try {
       return await request('/auth/verify')
     } catch {

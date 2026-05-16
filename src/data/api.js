@@ -1,4 +1,4 @@
-import { rutas, choferes, omnibus, reportes, asignaciones, rutasApi } from './apiClient'
+import { rutas, choferes, omnibus, asignaciones } from './apiClient'
 
 function safeParse(value, fallback) {
   try {
@@ -34,15 +34,6 @@ export async function getRutaConductor() {
   }
 }
 
-export async function getRutasLocales() {
-  const stored = localStorage.getItem('rutas')
-  return stored ? safeParse(stored, []) : []
-}
-
-export async function getItinerariosLocales() {
-  return getRutasLocales()
-}
-
 export async function addRuta(ruta) {
   return await rutas.create(ruta)
 }
@@ -63,52 +54,12 @@ export async function getChoferes() {
   }
 }
 
-export async function addChofer(chofer) {
-  return await choferes.create(chofer)
-}
-
-export async function updateChofer(id, chofer) {
-  return await choferes.update(id, chofer)
-}
-
-export async function deleteChofer(id) {
-  return await choferes.delete(id)
-}
-
 export async function getOmnibus() {
   try {
     return await omnibus.getAll()
   } catch {
     return []
   }
-}
-
-export async function getOmnibusDisponibles() {
-  try {
-    return await omnibus.getDisponibles()
-  } catch {
-    return []
-  }
-}
-
-export async function addOmnibus(omn) {
-  return await omnibus.create(omn)
-}
-
-export async function updateOmnibus(id, omn) {
-  return await omnibus.update(id, omn)
-}
-
-export async function deleteOmnibus(id) {
-  return await omnibus.delete(id)
-}
-
-export async function getReporteDia() {
-  return await reportes.getDia()
-}
-
-export async function copiarReporte() {
-  return await reportes.copiar()
 }
 
 export async function getAsignaciones(fecha) {
@@ -121,12 +72,4 @@ export async function saveAsignaciones(data) {
 
 export async function getHistorialAsignaciones(params) {
   return await asignaciones.getHistorial(params)
-}
-
-export async function deleteAsignacion(id) {
-  return await asignaciones.delete(id)
-}
-
-export async function getComunicado() {
-  return await rutasApi.getComunicado()
 }

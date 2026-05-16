@@ -237,7 +237,7 @@ export default function Rutas() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Nombre de la Ruta *</label>
-                <input type="text" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })}
+                <input type="text" value={form.nombre} onChange={e => setForm(prev => ({ ...prev, nombre: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 {errors.nombre && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.nombre}</p>}
               </div>
@@ -245,13 +245,13 @@ export default function Rutas() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Origen *</label>
-                  <input type="text" value={form.origen} onChange={e => setForm({ ...form, origen: e.target.value })}
+                  <input type="text" value={form.origen} onChange={e => setForm(prev => ({ ...prev, origen: e.target.value }))}
                     className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                   {errors.origen && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.origen}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Destino *</label>
-                  <input type="text" value={form.destino} onChange={e => setForm({ ...form, destino: e.target.value })}
+                  <input type="text" value={form.destino} onChange={e => setForm(prev => ({ ...prev, destino: e.target.value }))}
                     className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                   {errors.destino && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.destino}</p>}
                 </div>
@@ -260,13 +260,13 @@ export default function Rutas() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Distancia</label>
-                  <input type="text" value={form.distancia} onChange={e => setForm({ ...form, distancia: e.target.value })}
+                  <input type="text" value={form.distancia} onChange={e => setForm(prev => ({ ...prev, distancia: e.target.value }))}
                     placeholder="ej: 5.2 km"
                     className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Duración Estimada</label>
-                  <input type="text" value={form.duracion_estimada} onChange={e => setForm({ ...form, duracion_estimada: e.target.value })}
+                  <input type="text" value={form.duracion_estimada} onChange={e => setForm(prev => ({ ...prev, duracion_estimada: e.target.value }))}
                     placeholder="ej: 15 min"
                     className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 </div>
@@ -287,7 +287,7 @@ export default function Rutas() {
                         onChange={e => {
                           const nuevos = [...(form.puntos_json || [])]
                           nuevos[i] = { ...nuevos[i], nombre: e.target.value }
-                          setForm({ ...form, puntos_json: nuevos })
+                          setForm(prev => ({ ...prev, puntos_json: nuevos }))
                         }}
                         placeholder="Nombre del punto"
                         className="flex-1 px-2 py-1 text-sm rounded"
@@ -300,7 +300,7 @@ export default function Rutas() {
                         onChange={e => {
                           const nuevos = [...(form.puntos_json || [])]
                           nuevos[i] = { ...nuevos[i], lat: parseFloat(e.target.value) }
-                          setForm({ ...form, puntos_json: nuevos })
+                          setForm(prev => ({ ...prev, puntos_json: nuevos }))
                         }}
                         placeholder="Lat"
                         className="w-24 px-2 py-1 text-sm rounded"
@@ -313,7 +313,7 @@ export default function Rutas() {
                         onChange={e => {
                           const nuevos = [...(form.puntos_json || [])]
                           nuevos[i] = { ...nuevos[i], lng: parseFloat(e.target.value) }
-                          setForm({ ...form, puntos_json: nuevos })
+                          setForm(prev => ({ ...prev, puntos_json: nuevos }))
                         }}
                         placeholder="Lng"
                         className="w-24 px-2 py-1 text-sm rounded"
@@ -323,7 +323,7 @@ export default function Rutas() {
                         type="button"
                         onClick={() => {
                           const nuevos = (form.puntos_json || []).filter((_, idx) => idx !== i)
-                          setForm({ ...form, puntos_json: nuevos })
+                          setForm(prev => ({ ...prev, puntos_json: nuevos }))
                         }}
                         className="text-red-500 text-sm"
                       >
@@ -333,7 +333,7 @@ export default function Rutas() {
                   ))}
                   <button
                     type="button"
-                    onClick={() => setForm({ ...form, puntos_json: [...(form.puntos_json || []), { nombre: '', lat: 23.1136, lng: -82.3666 }] })}
+                    onClick={() => setForm(prev => ({ ...prev, puntos_json: [...(form.puntos_json || []), { nombre: '', lat: 23.1136, lng: -82.3666 }] }))}
                     className="text-sm"
                     style={{ color: '#2563eb' }}
                   >
@@ -347,7 +347,7 @@ export default function Rutas() {
 
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Observación</label>
-                <textarea value={form.observacion} onChange={e => setForm({ ...form, observacion: e.target.value })}
+                <textarea value={form.observacion} onChange={e => setForm(prev => ({ ...prev, observacion: e.target.value }))}
                   rows={2}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
               </div>

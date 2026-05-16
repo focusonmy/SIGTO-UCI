@@ -16,6 +16,76 @@ function getHorarioLabel(hora) {
   return h === '06:45' ? 'Mañana (06:45)' : 'Tarde (17:15)'
 }
 
+function PageNumbers({ currentPage, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null
+  const pages = []
+  const maxVisible = 5
+  let startPage = Math.max(1, currentPage - 2)
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+  if (endPage - startPage < maxVisible - 1) {
+    startPage = Math.max(1, endPage - maxVisible + 1)
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i)
+  }
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+        className="px-3 py-1 rounded text-sm"
+        style={{
+          border: '1px solid #e2e8f0',
+          color: currentPage === 1 ? '#94a3b8' : '#2563eb',
+          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+          background: 'transparent'
+        }}
+      >
+        &lt;
+      </button>
+      {startPage > 1 && (
+        <>
+          <button onClick={() => onPageChange(1)} className="px-3 py-1 rounded text-sm" style={{ border: '1px solid #e2e8f0', color: '#2563eb', background: 'transparent' }}>1</button>
+          {startPage > 2 && <span className="px-1" style={{ color: '#64748b' }}>...</span>}
+        </>
+      )}
+      {pages.map(p => (
+        <button
+          key={p}
+          onClick={() => onPageChange(p)}
+          className="px-3 py-1 rounded text-sm"
+          style={{
+            border: '1px solid #e2e8f0',
+            background: p === currentPage ? '#2563eb' : 'transparent',
+            color: p === currentPage ? '#ffffff' : '#2563eb'
+          }}
+        >
+          {p}
+        </button>
+      ))}
+      {endPage < totalPages && (
+        <>
+          {endPage < totalPages - 1 && <span className="px-1" style={{ color: '#64748b' }}>...</span>}
+          <button onClick={() => onPageChange(totalPages)} className="px-3 py-1 rounded text-sm" style={{ border: '1px solid #e2e8f0', color: '#2563eb', background: 'transparent' }}>{totalPages}</button>
+        </>
+      )}
+      <button
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+        className="px-3 py-1 rounded text-sm"
+        style={{
+          border: '1px solid #e2e8f0',
+          color: currentPage === totalPages ? '#94a3b8' : '#2563eb',
+          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+          background: 'transparent'
+        }}
+      >
+        &gt;
+      </button>
+    </div>
+  )
+}
+
 export default function Historial() {
   const [historial, setHistorial] = useState([])
   const [choferes, setChoferes] = useState([])
@@ -77,74 +147,8 @@ export default function Historial() {
   const startItem = totalCount === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalCount)
 
-  function PageNumbers() {
-    if (totalPages <= 1) return null
-    const pages = []
-    const maxVisible = 5
-    let startPage = Math.max(1, currentPage - 2)
-    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
-    if (endPage - startPage < maxVisible - 1) {
-      startPage = Math.max(1, endPage - maxVisible + 1)
-    }
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
-    }
-    return (
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 rounded text-sm"
-          style={{
-            border: '1px solid #e2e8f0',
-            color: currentPage === 1 ? '#94a3b8' : '#2563eb',
-            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            background: 'transparent'
-          }}
-        >
-          &lt;
-        </button>
-        {startPage > 1 && (
-          <>
-            <button onClick={() => setCurrentPage(1)} className="px-3 py-1 rounded text-sm" style={{ border: '1px solid #e2e8f0', color: '#2563eb', background: 'transparent' }}>1</button>
-            {startPage > 2 && <span className="px-1" style={{ color: '#64748b' }}>...</span>}
-          </>
-        )}
-        {pages.map(p => (
-          <button
-            key={p}
-            onClick={() => setCurrentPage(p)}
-            className="px-3 py-1 rounded text-sm"
-            style={{
-              border: '1px solid #e2e8f0',
-              background: p === currentPage ? '#2563eb' : 'transparent',
-              color: p === currentPage ? '#ffffff' : '#2563eb'
-            }}
-          >
-            {p}
-          </button>
-        ))}
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && <span className="px-1" style={{ color: '#64748b' }}>...</span>}
-            <button onClick={() => setCurrentPage(totalPages)} className="px-3 py-1 rounded text-sm" style={{ border: '1px solid #e2e8f0', color: '#2563eb', background: 'transparent' }}>{totalPages}</button>
-          </>
-        )}
-        <button
-          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded text-sm"
-          style={{
-            border: '1px solid #e2e8f0',
-            color: currentPage === totalPages ? '#94a3b8' : '#2563eb',
-            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-            background: 'transparent'
-          }}
-        >
-          &gt;
-        </button>
-      </div>
-    )
+  function handlePageChange(page) {
+    setCurrentPage(page)
   }
 
   return (
@@ -262,7 +266,7 @@ export default function Historial() {
                 </tr>
               ) : (
                 paginated.map((item, i) => (
-                  <tr key={`${item.fecha}-${item.ruta}-${item.hora}-${i}`} className="hover:bg-gray-50">
+                  <tr key={`${item.fecha}-${item.ruta}-${item.hora}`} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium" style={{ color: '#0f172a' }}>{item.fecha}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 rounded-full text-xs font-medium"
@@ -288,7 +292,7 @@ export default function Historial() {
 
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
-          <PageNumbers />
+          <PageNumbers currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
       )}
 

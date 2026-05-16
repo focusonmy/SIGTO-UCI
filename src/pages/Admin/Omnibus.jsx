@@ -217,30 +217,30 @@ export default function Omnibus() {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Placa *</label>
-                <input type="text" value={form.placa} onChange={e => setForm({ ...form, placa: e.target.value.toUpperCase() })}
+                <label htmlFor="placa" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Placa *</label>
+                <input id="placa" type="text" value={form.placa} onChange={e => setForm(prev => ({ ...prev, placa: e.target.value.toUpperCase() }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 {errors.placa && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.placa}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Marca *</label>
-                <input type="text" value={form.marca} onChange={e => setForm({ ...form, marca: e.target.value })}
+                <label htmlFor="marca" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Marca *</label>
+                <input id="marca" type="text" value={form.marca} onChange={e => setForm(prev => ({ ...prev, marca: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 {errors.marca && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.marca}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Modelo</label>
-                <input type="text" value={form.modelo} onChange={e => setForm({ ...form, modelo: e.target.value })}
+<label htmlFor="modelo" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Modelo</label>
+                <input id="modelo" type="text" value={form.modelo} onChange={e => setForm(prev => ({ ...prev, modelo: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Año</label>
-                <input type="number" value={form.anio} onChange={e => setForm({ ...form, anio: e.target.value })}
+                <label htmlFor="anio" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Año</label>
+                <input id="anio" type="number" value={form.anio} onChange={e => setForm(prev => ({ ...prev, anio: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Capacidad</label>
-                <select value={form.capacidad} onChange={e => setForm({ ...form, capacidad: parseInt(e.target.value) })}
+                <label htmlFor="capacidad" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Capacidad</label>
+                <select id="capacidad" value={form.capacidad} onChange={e => setForm(prev => ({ ...prev, capacidad: parseInt(e.target.value) }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }}>
                   {[20, 25, 30, 35, 40, 45, 50].map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -248,8 +248,8 @@ export default function Omnibus() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Tipo</label>
-                <select value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })}
+                <label htmlFor="tipo" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Tipo</label>
+                <select id="tipo" value={form.tipo} onChange={e => setForm(prev => ({ ...prev, tipo: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }}>
                   <option value="estandar">Estándar</option>
                   <option value="semicama">Semi Cama</option>
@@ -257,8 +257,8 @@ export default function Omnibus() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Estado</label>
-                <select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })}
+                <label htmlFor="estado" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Estado</label>
+                <select id="estado" value={form.estado} onChange={e => setForm(prev => ({ ...prev, estado: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }}>
                   <option value="disponible">Disponible</option>
                   <option value="en_servicio">En Servicio</option>
@@ -266,14 +266,14 @@ export default function Omnibus() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Seguro *</label>
-                <input type="text" value={form.seguro} onChange={e => setForm({ ...form, seguro: e.target.value })}
+                <label htmlFor="seguro" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Seguro *</label>
+                <input id="seguro" type="text" value={form.seguro} onChange={e => setForm(prev => ({ ...prev, seguro: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 {errors.seguro && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.seguro}</p>}
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Vencimiento Seguro *</label>
-                <input type="date" value={form.fecha_venc_seguro} onChange={e => setForm({ ...form, fecha_venc_seguro: e.target.value })}
+                <label htmlFor="fecha_venc_seguro" className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>Vencimiento Seguro *</label>
+                <input id="fecha_venc_seguro" type="date" value={form.fecha_venc_seguro} onChange={e => setForm(prev => ({ ...prev, fecha_venc_seguro: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg" style={{ border: '1px solid #e2e8f0' }} />
                 {errors.fecha_venc_seguro && <p className="text-sm mt-1" style={{ color: '#ef4444' }}>{errors.fecha_venc_seguro}</p>}
               </div>

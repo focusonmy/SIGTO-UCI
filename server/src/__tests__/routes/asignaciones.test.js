@@ -110,6 +110,12 @@ describe('GET /api/asignaciones', () => {
 describe('POST /api/asignaciones', () => {
   beforeEach(() => {
     mockAsignaciones.length = 0
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-05-11'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('retorna 401 sin token', async () => {

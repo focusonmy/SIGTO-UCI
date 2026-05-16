@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../data/auth'
 import { getRutasPublicas, getRutaConductor } from '../data/api'
@@ -8,7 +8,7 @@ export default function RutasPublicas() {
   const navigate = useNavigate()
   const [data, setData] = useState({ tipo: 'hoy', label: '', rutas: [] })
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const errorRef = useRef('')
 
   useEffect(() => {
     if (user?.role === 'conductor') {
@@ -24,7 +24,7 @@ export default function RutasPublicas() {
       const result = await getRutasPublicas()
       setData(result || { tipo: 'hoy', label: '', rutas: [] })
     } catch (e) {
-      setError(e.message)
+      errorRef.current = e.message
       setData({ tipo: 'hoy', label: '', rutas: [] })
     } finally {
       setLoading(false)
@@ -36,7 +36,7 @@ export default function RutasPublicas() {
       setLoading(true)
       const result = await getRutaConductor()
       if (result.error) {
-        setError(result.error)
+        errorRef.current = result.error
         setData({ tipo: 'hoy', label: '', rutas: [] })
       } else {
         setData({
@@ -48,7 +48,7 @@ export default function RutasPublicas() {
         })
       }
     } catch (e) {
-      setError(e.message)
+      errorRef.current = e.message
       setData({ tipo: 'hoy', label: '', rutas: [] })
     } finally {
       setLoading(false)
