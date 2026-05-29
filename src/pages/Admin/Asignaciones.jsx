@@ -10,26 +10,51 @@ function getHorarioLabel(hora) {
 
 let asignacionesState = []
 
-function getProximosDiasLaborables(hoy, cantidad = 2) {
-  const dias = []
-  const fecha = new Date(hoy)
-  fecha.setHours(0, 0, 0, 0)
-  for (let i = 0; i <= 2; i++) {
-    const diaSemana = fecha.getDay()
-    if (diaSemana >= 1 && diaSemana <= 5) {
-      dias.push(fecha.toISOString().split('T')[0])
-      if (dias.length >= cantidad) break
+function getRangoFechasValidas() {
+  const hoy = new Date()
+  const hoyDate = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
+  const diaSemana = hoyDate.getDay()
+
+  const validDates = []
+  const cursor = new Date(hoyDate)
+
+  if (diaSemana === 6) {
+    cursor.setDate(cursor.getDate() + 2)
+    validDates.push(new Date(cursor))
+  } else if (diaSemana === 0) {
+    cursor.setDate(cursor.getDate() + 1)
+    validDates.push(new Date(cursor))
+    cursor.setDate(cursor.getDate() + 1)
+    validDates.push(new Date(cursor))
+  } else {
+    while (validDates.length < 3) {
+      const dw = cursor.getDay()
+      if (dw >= 1 && dw <= 5) {
+        validDates.push(new Date(cursor))
+      }
+      cursor.setDate(cursor.getDate() + 1)
     }
-    fecha.setDate(fecha.getDate() + 1)
   }
-  return dias
+
+  const format = (d) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  return {
+    dias: validDates.map(format),
+    min: format(validDates[0]),
+    max: format(validDates[validDates.length - 1]),
+    primerDia: format(validDates[0])
+  }
 }
 
 export default function Asignaciones() {
-  const hoyLocal = new Date()
-  hoyLocal.setHours(0, 0, 0, 0)
-  const diasValidos = getProximosDiasLaborables(hoyLocal, 2)
-  const primerDiaValido = diasValidos[0] || null
+  const rangoFechas = getRangoFechasValidas()
+  const diasValidos = rangoFechas.dias
+  const primerDiaValido = rangoFechas.primerDia
 
   const [fecha, setFecha] = useState(primerDiaValido)
   const [rutasFijas, setRutasFijas] = useState([])
@@ -112,18 +137,21 @@ export default function Asignaciones() {
     return ocupados
   }
 
+  function applyUpdate(prev, rutaId, hora, campo, valor) {
+    const existente = prev.find(a => a.ruta_id === rutaId && a.hora === hora)
+    if (existente) {
+      return prev.map(a =>
+        a.ruta_id === rutaId && a.hora === hora ? { ...a, [campo]: valor } : a
+      )
+    }
+    return [...prev, { ruta_id: rutaId, hora, [campo]: valor }]
+  }
+
   function updateAsignacion(rutaId, hora, campo, valor) {
     setAsignaciones(prev => {
-      const existente = prev.find(a => a.ruta_id === rutaId && a.hora === hora)
-      let updated
-      if (existente) {
-        updated = prev.map(a =>
-          a.ruta_id === rutaId && a.hora === hora
-            ? { ...a, [campo]: valor }
-            : a
-        )
-      } else {
-        updated = [...prev, { ruta_id: rutaId, hora, [campo]: valor }]
+      let updated = applyUpdate(prev, rutaId, hora, campo, valor)
+      if (hora === '06:45') {
+        updated = applyUpdate(updated, rutaId, '17:15', campo, valor)
       }
       asignacionesState = updated
       return updated
@@ -133,23 +161,48 @@ export default function Asignaciones() {
   async function handleSave() {
     setSaving(true)
     try {
+      let faltan = false
+      rutasFijas.forEach(ruta => {
+        HORAS.forEach(hora => {
+          const existente = getAsignacion(ruta.id, hora)
+          if (!existente) { faltan = true; return }
+          if (existente.excluded) return
+          if (!existente.chofer_id || !existente.omnibus_id) faltan = true
+        })
+      })
+
+      if (faltan) {
+        setToast({
+          open: true,
+          message: 'Faltan rutas por asignar',
+          type: 'warning'
+        })
+        setSaving(false)
+        return
+      }
+
       const asignacionesData = []
       rutasFijas.forEach(ruta => {
         HORAS.forEach(hora => {
           const existente = getAsignacion(ruta.id, hora)
-          if (existente) {
-            const excluded = existente.excluded === true
-            asignacionesData.push({
-              ruta_id: ruta.id,
-              chofer_id: excluded ? null : (existente.chofer_id || null),
-              omnibus_id: excluded ? null : (existente.omnibus_id || null),
-              hora: hora,
-              estado: excluded ? 'cancelada' : (existente.estado || 'garantizada'),
-              observacion: existente.observacion || null
-            })
-          }
+          if (!existente) return
+          if (existente.excluded) return
+          asignacionesData.push({
+            ruta_id: ruta.id,
+            chofer_id: existente.chofer_id,
+            omnibus_id: existente.omnibus_id,
+            hora: hora,
+            estado: 'garantizada',
+            observacion: existente.observacion || null
+          })
         })
       })
+
+      if (asignacionesData.length === 0) {
+        setToast({ open: true, message: 'No hay asignaciones para guardar', type: 'warning' })
+        setSaving(false)
+        return
+      }
 
       await saveAsignaciones({ fecha, asignaciones: asignacionesData })
       setToast({ open: true, message: 'Asignaciones guardadas exitosamente', type: 'success' })
@@ -312,8 +365,8 @@ export default function Asignaciones() {
             type="date"
             value={fecha || ''}
             onChange={e => setFecha(e.target.value)}
-            min={primerDiaValido || ''}
-            max={diasValidos[diasValidos.length - 1] || ''}
+            min={rangoFechas.min}
+            max={rangoFechas.max}
             className="px-4 py-2 rounded-lg"
             style={{ border: errorFecha ? '1px solid #ef4444' : '1px solid #e2e8f0' }}
           />

@@ -169,6 +169,97 @@ describe('POST /api/asignaciones', () => {
     expect(res.status).toBe(201)
     expect(res.body.asignaciones[0].estado).toBe('cancelada')
   })
+
+})
+
+describe('POST /api/asignaciones - validacion de fechas', () => {
+  beforeEach(() => {
+    mockAsignaciones.length = 0
+    vi.useRealTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  function localDate(year, month, day) {
+    return new Date(year, month - 1, day)
+  }
+
+  it('retorna 400 sabado → martes (fuera de rango)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 9) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-12',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toContain('Fecha inválida')
+  })
+
+  it('retorna 201 sabado → lunes', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 9) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-11',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(201)
+  })
+
+  it('retorna 201 domingo → lunes', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 10) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-11',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(201)
+  })
+
+  it('retorna 201 domingo → martes', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 10) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-12',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(201)
+  })
+
+  it('retorna 400 domingo → miercoles (fuera de rango)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 10) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-13',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toContain('Fecha inválida')
+  })
+
+  it('retorna 400 viernes → miercoles (fuera de rango)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 15) })
+    const res = await request(app)
+      .post('/api/asignaciones')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        fecha: '2026-05-20',
+        asignaciones: [{ ruta_id: 'r1', chofer_id: 'c1', omnibus_id: 'o1', hora: '06:45', estado: 'garantizada' }]
+      })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toContain('Fecha inválida')
+  })
 })
 
 describe('DELETE /api/asignaciones/:id', () => {

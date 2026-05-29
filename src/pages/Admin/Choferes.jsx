@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { choferes as API } from '../../data/apiClient'
 import ConfirmModal from '../../components/ConfirmModal'
+import DetailModal from '../../components/DetailModal'
 import Toast from '../../components/Toast'
 
 const initialForm = {
@@ -86,6 +87,7 @@ export default function Choferes() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
+  const [detailModal, setDetailModal] = useState({ open: false, item: null })
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' })
   const [errorModal, setErrorModal] = useState({ open: false, message: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -246,7 +248,7 @@ export default function Choferes() {
             </thead>
             <tbody className="divide-y" style={{ borderColor: '#e2e8f0' }}>
               {filtered.map(chofer => (
-                <tr key={chofer.id} className="hover:bg-gray-50">
+                <tr key={chofer.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setDetailModal({ open: true, item: chofer })}>
                   <td className="px-4 py-3 font-medium" style={{ color: '#0f172a' }}>{chofer.cedula}</td>
                   <td className="px-4 py-3" style={{ color: '#0f172a' }}>{chofer.nombre}</td>
                   <td className="px-4 py-3" style={{ color: '#2563eb' }}>{chofer.usuario?.username || '-'}</td>
@@ -254,8 +256,8 @@ export default function Choferes() {
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{chofer.licencia || '-'}</td>
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{chofer.fecha_venc_licencia || '-'}</td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleEdit(chofer)} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
-                    <button onClick={() => confirmDelete(chofer)} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
+                    <button onClick={e => { e.stopPropagation(); handleEdit(chofer) }} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
+                    <button onClick={e => { e.stopPropagation(); confirmDelete(chofer) }} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
                   </td>
                 </tr>
               ))}
@@ -433,6 +435,15 @@ export default function Choferes() {
           </div>
         )}
       
+
+      <DetailModal
+        isOpen={detailModal.open}
+        item={detailModal.item}
+        type="chofer"
+        onEdit={(item) => { setDetailModal({ open: false, item: null }); handleEdit(item) }}
+        onDelete={(item) => { setDetailModal({ open: false, item: null }); confirmDelete(item) }}
+        onClose={() => setDetailModal({ open: false, item: null })}
+      />
 
       <ConfirmModal
         isOpen={deleteModal.open}

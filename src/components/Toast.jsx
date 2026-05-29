@@ -14,9 +14,10 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   if (!visible) return null
 
   const isSuccess = type === 'success'
-  const bgColor = isSuccess ? '#dcfce7' : '#fef2f2'
-  const textColor = isSuccess ? '#166534' : '#991b1b'
-  const iconColor = isSuccess ? '#22c55e' : '#ef4444'
+  const isWarning = type === 'warning'
+  const bgColor = isSuccess ? '#dcfce7' : isWarning ? '#fef9c3' : '#fef2f2'
+  const textColor = isSuccess ? '#166534' : isWarning ? '#854d0e' : '#991b1b'
+  const iconColor = isSuccess ? '#22c55e' : isWarning ? '#eab308' : '#ef4444'
 
   return (
     <div 
@@ -27,6 +28,8 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         {isSuccess ? (
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        ) : isWarning ? (
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
         ) : (
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         )}

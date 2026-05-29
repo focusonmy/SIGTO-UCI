@@ -112,7 +112,7 @@ export default function Reportes() {
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <p className="font-medium" style={{ color: '#0f172a' }}>{ruta.ruta}</p>
+                      <p className="font-medium" style={{ color: '#0f172a' }}>{ruta.nombre}</p>
                       <p className="text-sm" style={{ color: '#64748b' }}>{ruta.hora}</p>
                     </div>
                     <span 

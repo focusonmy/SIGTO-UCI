@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { omnibus as API } from '../../data/apiClient'
 import ConfirmModal from '../../components/ConfirmModal'
+import DetailModal from '../../components/DetailModal'
 import Toast from '../../components/Toast'
 
 const initialForm = {
@@ -42,6 +43,7 @@ export default function Omnibus() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
+  const [detailModal, setDetailModal] = useState({ open: false, item: null })
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' })
   const [errorModal, setErrorModal] = useState({ open: false, message: '' })
 
@@ -188,7 +190,7 @@ export default function Omnibus() {
             </thead>
             <tbody className="divide-y" style={{ borderColor: '#e2e8f0' }}>
               {filtered.map(omn => (
-                <tr key={omn.id} className="hover:bg-gray-50">
+                <tr key={omn.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setDetailModal({ open: true, item: omn })}>
                   <td className="px-4 py-3 font-medium" style={{ color: '#0f172a' }}>{omn.placa}</td>
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{omn.marca} {omn.modelo}</td>
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{omn.capacidad}</td>
@@ -199,8 +201,8 @@ export default function Omnibus() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleEdit(omn)} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
-                    <button onClick={() => confirmDelete(omn)} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
+                    <button onClick={e => { e.stopPropagation(); handleEdit(omn) }} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
+                    <button onClick={e => { e.stopPropagation(); confirmDelete(omn) }} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
                   </td>
                 </tr>
               ))}
@@ -287,6 +289,15 @@ export default function Omnibus() {
           </div>
         </div>
       )}
+
+      <DetailModal
+        isOpen={detailModal.open}
+        item={detailModal.item}
+        type="omnibus"
+        onEdit={(item) => { setDetailModal({ open: false, item: null }); handleEdit(item) }}
+        onDelete={(item) => { setDetailModal({ open: false, item: null }); confirmDelete(item) }}
+        onClose={() => setDetailModal({ open: false, item: null })}
+      />
 
       <ConfirmModal
         isOpen={deleteModal.open}

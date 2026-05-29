@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { addRuta, updateRuta, deleteRuta, getRutas as getRutasData } from '../../data/api'
 import MapaRuta from '../../components/MapaRuta'
 import ConfirmModal from '../../components/ConfirmModal'
+import DetailModal from '../../components/DetailModal'
 import Toast from '../../components/Toast'
 
 const initialForm = {
@@ -38,6 +39,7 @@ export default function Rutas() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nombre: '' })
+  const [detailModal, setDetailModal] = useState({ open: false, item: null })
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' })
   const [errorModal, setErrorModal] = useState({ open: false, message: '' })
   const [loadError, setLoadError] = useState('')
@@ -209,7 +211,7 @@ export default function Rutas() {
                 </tr>
               ) : (
                 filteredRutas.map(ruta => (
-                <tr key={ruta.id} className="hover:bg-gray-50">
+                <tr key={ruta.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setDetailModal({ open: true, item: ruta })}>
                   <td className="px-4 py-3 font-medium" style={{ color: '#0f172a' }}>{ruta.nombre}</td>
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>
                     {ruta.origen} → {ruta.destino}
@@ -217,8 +219,8 @@ export default function Rutas() {
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{ruta.distancia || '-'}</td>
                   <td className="px-4 py-3" style={{ color: '#64748b' }}>{ruta.duracion_estimada || '-'}</td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleEdit(ruta)} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
-                    <button onClick={() => confirmDelete(ruta)} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
+                    <button onClick={e => { e.stopPropagation(); handleEdit(ruta) }} className="mr-3 text-sm" style={{ color: '#2563eb' }}>Editar</button>
+                    <button onClick={e => { e.stopPropagation(); confirmDelete(ruta) }} className="text-sm" style={{ color: '#ef4444' }}>Eliminar</button>
                   </td>
                 </tr>
               )))}
@@ -361,6 +363,15 @@ export default function Rutas() {
           </div>
         </div>
       )}
+
+      <DetailModal
+        isOpen={detailModal.open}
+        item={detailModal.item}
+        type="ruta"
+        onEdit={(item) => { setDetailModal({ open: false, item: null }); handleEdit(item) }}
+        onDelete={(item) => { setDetailModal({ open: false, item: null }); confirmDelete(item) }}
+        onClose={() => setDetailModal({ open: false, item: null })}
+      />
 
       <ConfirmModal
         isOpen={deleteModal.open}

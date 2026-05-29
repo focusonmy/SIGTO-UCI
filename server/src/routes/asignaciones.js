@@ -4,6 +4,7 @@ import { Ruta, AsignacionRuta, Chofer, Omnibus } from '../models/index.js'
 import { Op } from 'sequelize'
 import logger from '../utils/logger.js'
 import { isValidUUID } from '../utils/validators.js'
+import { getRangoFechasValidas } from '../utils/dateUtils.js'
 
 const router = Router()
 
@@ -41,20 +42,12 @@ router.post('/', authMiddleware, roleMiddleware('admin'), async (req, res) => {
       return res.status(400).json({ error: 'Fecha y asignaciones son requeridos' })
     }
 
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
-    const maxFecha = new Date()
-    maxFecha.setDate(hoy.getDate() + 2)
-    maxFecha.setHours(23, 59, 59, 999)
-    const fechaDate = new Date(fecha)
-    const diaSemana = fechaDate.getDay()
+    const rango = getRangoFechasValidas()
 
-    if (fechaDate < hoy || fechaDate > maxFecha) {
-      return res.status(400).json({ error: 'La fecha debe ser hoy o maximo 2 dias en el futuro' })
-    }
-
-    if (diaSemana === 0 || diaSemana === 6) {
-      return res.status(400).json({ error: 'No se pueden hacer asignaciones en fines de semana' })
+    if (!rango.isValid(fecha)) {
+      return res.status(400).json({
+        error: `Fecha inválida. Solo se permiten días laborables desde ${rango.fechasValidas[0]} hasta ${rango.fechasValidas[rango.fechasValidas.length - 1]}`
+      })
     }
 
     const resultados = []
