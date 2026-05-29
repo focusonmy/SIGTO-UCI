@@ -1,3 +1,5 @@
+import MapaRuta from './MapaRuta'
+
 function Field({ label, children }) {
   return (
     <div>
@@ -22,16 +24,20 @@ function renderRuta(item) {
       <Field label="Duración">
         <p className="text-sm" style={{ color: '#0f172a' }}>{item.duracion_estimada || '-'}</p>
       </Field>
-      {(item.puntos_json && item.puntos_json.length > 0) && (
+      {item.chofer && (
+        <Field label="Conductor">
+          <p className="text-sm" style={{ color: '#0f172a' }}>{item.chofer.nombre}</p>
+        </Field>
+      )}
+      {item.omnibus && (
+        <Field label="Unidad">
+          <p className="text-sm" style={{ color: '#0f172a' }}>{item.omnibus.placa} - {item.omnibus.marca} ({item.omnibus.capacidad} pasajeros)</p>
+        </Field>
+      )}
+      {item.puntos_json && item.puntos_json.length > 0 && (
         <div className="col-span-2">
-          <p className="text-xs font-medium mb-1" style={{ color: '#64748b' }}>Puntos del Recorrido</p>
-          <div className="space-y-1">
-            {item.puntos_json.map((punto, i) => (
-              <p key={i} className="text-xs" style={{ color: '#64748b' }}>
-                {i + 1}. {punto.nombre || 'Sin nombre'} ({punto.lat}, {punto.lng})
-              </p>
-            ))}
-          </div>
+          <p className="text-xs font-medium mb-1" style={{ color: '#64748b' }}>Recorrido</p>
+          <MapaRuta puntos={item.puntos_json} altura="250px" />
         </div>
       )}
       {item.observacion && (
@@ -115,7 +121,7 @@ function renderOmnibus(item) {
   )
 }
 
-export default function DetailModal({ isOpen, item, type, onEdit, onDelete, onClose }) {
+export default function DetailModal({ isOpen, item, type, onEdit, onDelete, onClose, showActions = true }) {
   if (!isOpen || !item) return null
 
   const titleMap = {
@@ -144,22 +150,24 @@ export default function DetailModal({ isOpen, item, type, onEdit, onDelete, onCl
           {type === 'omnibus' && renderOmnibus(item)}
         </div>
 
-        <div className="flex gap-3 justify-end" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
-          <button
-            onClick={() => { onEdit(item); onClose() }}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
-            style={{ background: '#2563eb' }}
-          >
-            Editar
-          </button>
-          <button
-            onClick={() => { onDelete(item); onClose() }}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-            style={{ background: '#dc2626' }}
-          >
-            Eliminar
-          </button>
-        </div>
+        {showActions && (
+          <div className="flex gap-3 justify-end" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+            <button
+              onClick={() => { onEdit(item); onClose() }}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+              style={{ background: '#2563eb' }}
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => { onDelete(item); onClose() }}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+              style={{ background: '#dc2626' }}
+            >
+              Eliminar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

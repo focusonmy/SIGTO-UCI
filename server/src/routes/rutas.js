@@ -65,7 +65,7 @@ router.get('/publicas', async (req, res) => {
         {
           model: Ruta,
           as: 'ruta',
-          attributes: ['id', 'nombre', 'origen', 'destino']
+          attributes: ['id', 'nombre', 'origen', 'destino', 'distancia', 'duracion_estimada', 'puntos_json']
         },
         { model: Chofer, as: 'chofer', attributes: ['id', 'nombre'] },
         { model: Omnibus, as: 'omnibus', attributes: ['id', 'placa', 'marca', 'capacidad'] }
@@ -78,6 +78,9 @@ router.get('/publicas', async (req, res) => {
       nombre: a.ruta?.nombre,
       origen: a.ruta?.origen,
       destino: a.ruta?.destino,
+      distancia: a.ruta?.distancia,
+      duracion_estimada: a.ruta?.duracion_estimada,
+      puntos_json: a.ruta?.puntos_json,
       hora: a.hora,
       chofer: a.chofer ? { id: a.chofer.id, nombre: a.chofer.nombre } : null,
       omnibus: a.omnibus ? { id: a.omnibus.id, placa: a.omnibus.placa, marca: a.omnibus.marca, capacidad: a.omnibus.capacidad } : null
@@ -106,7 +109,7 @@ router.get('/conductor-hoy', authMiddleware, async (req, res) => {
     const asignaciones = await AsignacionRuta.findAll({
       where: { fecha, chofer_id: chofer.id },
       include: [
-        { model: Ruta, as: 'ruta', attributes: ['id', 'nombre', 'origen', 'destino'] },
+        { model: Ruta, as: 'ruta', attributes: ['id', 'nombre', 'origen', 'destino', 'distancia', 'duracion_estimada', 'puntos_json'] },
         { model: Omnibus, as: 'omnibus', attributes: ['id', 'placa', 'marca', 'capacidad'] }
       ],
       order: [['hora', 'ASC']]
@@ -122,6 +125,9 @@ router.get('/conductor-hoy', authMiddleware, async (req, res) => {
         nombre: a.ruta?.nombre,
         origen: a.ruta?.origen,
         destino: a.ruta?.destino,
+        distancia: a.ruta?.distancia,
+        duracion_estimada: a.ruta?.duracion_estimada,
+        puntos_json: a.ruta?.puntos_json,
         hora: a.hora,
         omnibus: a.omnibus ? { placa: a.omnibus.placa, marca: a.omnibus.marca, capacidad: a.omnibus.capacidad } : null
       }))

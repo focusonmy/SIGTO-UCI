@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../data/auth'
 import { getRutasPublicas, getRutaConductor } from '../data/api'
+import DetailModal from '../components/DetailModal'
 
 export default function RutasPublicas() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [data, setData] = useState({ tipo: 'hoy', label: '', rutas: [] })
   const [loading, setLoading] = useState(true)
+  const [detailModal, setDetailModal] = useState({ open: false, item: null })
   const errorRef = useRef('')
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function RutasPublicas() {
                 <div className="mb-6">
                   <h3 className="font-semibold text-sm mb-2" style={{ color: '#2563eb' }}>HORARIO MAÑANA (06:45)</h3>
                   {rutasManana.map(ruta => (
-                    <div key={ruta.id} className="p-4 rounded-xl mb-3" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }}>
+                    <div key={ruta.id} className="p-4 rounded-xl mb-3 cursor-pointer" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }} onClick={() => setDetailModal({ open: true, item: ruta })}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-bold" style={{ color: '#0f172a' }}>{ruta.nombre}</h4>
@@ -109,7 +111,7 @@ export default function RutasPublicas() {
                 <div>
                   <h3 className="font-semibold text-sm mb-2" style={{ color: '#2563eb' }}>HORARIO TARDE (17:15)</h3>
                   {rutasTarde.map(ruta => (
-                    <div key={ruta.id} className="p-4 rounded-xl mb-3" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }}>
+                    <div key={ruta.id} className="p-4 rounded-xl mb-3 cursor-pointer" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }} onClick={() => setDetailModal({ open: true, item: ruta })}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-bold" style={{ color: '#0f172a' }}>{ruta.nombre}</h4>
@@ -135,6 +137,14 @@ export default function RutasPublicas() {
             </div>
           )}
         </main>
+
+        <DetailModal
+          isOpen={detailModal.open}
+          item={detailModal.item}
+          type="ruta"
+          showActions={false}
+          onClose={() => setDetailModal({ open: false, item: null })}
+        />
       </div>
     )
   }
@@ -163,7 +173,7 @@ export default function RutasPublicas() {
                 <h3 className="font-semibold text-sm mb-3" style={{ color: '#2563eb' }}>HORARIO MAÑANA (06:45)</h3>
                 <div className="space-y-3">
                   {rutasManana.map(ruta => (
-                    <div key={ruta.id} className="p-4 rounded-xl" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }}>
+                    <div key={ruta.id} className="p-4 rounded-xl cursor-pointer" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }} onClick={() => setDetailModal({ open: true, item: ruta })}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-bold" style={{ color: '#0f172a' }}>{ruta.nombre}</h4>
@@ -188,7 +198,7 @@ export default function RutasPublicas() {
                 <h3 className="font-semibold text-sm mb-3" style={{ color: '#2563eb' }}>HORARIO TARDE (17:15)</h3>
                 <div className="space-y-3">
                   {rutasTarde.map(ruta => (
-                    <div key={ruta.id} className="p-4 rounded-xl" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }}>
+                    <div key={ruta.id} className="p-4 rounded-xl cursor-pointer" style={{ background: '#ffffff', border: '1px solid #e2e8f0' }} onClick={() => setDetailModal({ open: true, item: ruta })}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-bold" style={{ color: '#0f172a' }}>{ruta.nombre}</h4>
@@ -214,6 +224,14 @@ export default function RutasPublicas() {
           </div>
         )}
       </main>
+
+      <DetailModal
+        isOpen={detailModal.open}
+        item={detailModal.item}
+        type="ruta"
+        showActions={false}
+        onClose={() => setDetailModal({ open: false, item: null })}
+      />
     </div>
   )
 }
