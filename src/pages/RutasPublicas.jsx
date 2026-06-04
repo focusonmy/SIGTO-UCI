@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../data/auth'
 import { getRutasPublicas, getRutaConductor } from '../data/api'
 import DetailModal from '../components/DetailModal'
 
 export default function RutasPublicas() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const [data, setData] = useState({ tipo: 'hoy', label: '', rutas: [] })
   const [loading, setLoading] = useState(true)
   const [detailModal, setDetailModal] = useState({ open: false, item: null })
@@ -64,11 +62,8 @@ export default function RutasPublicas() {
     return (
       <div className="min-h-screen" style={{ background: '#f8fafc' }}>
         <header className="shadow-sm" style={{ background: '#ffffff' }}>
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="max-w-4xl mx-auto px-4 py-4 text-center">
             <h1 className="text-xl font-bold" style={{ color: '#0f172a' }}>{data.label || 'Mis Rutas'}</h1>
-            <button onClick={() => navigate('/login', { replace: true })} className="text-sm" style={{ color: '#64748b' }}>
-              Cerrar sesión
-            </button>
           </div>
         </header>
         <main className="max-w-4xl mx-auto px-4 py-6">
