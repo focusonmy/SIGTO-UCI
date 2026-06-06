@@ -4,7 +4,7 @@ import { Ruta, AsignacionRuta, Chofer, Omnibus } from '../models/index.js'
 import { Op } from 'sequelize'
 import logger from '../utils/logger.js'
 import { isValidUUID } from '../utils/validators.js'
-import { getRangoFechasValidas } from '../utils/dateUtils.js'
+import { getRangoFechasValidas, getHoyLocal, formatLocalDate } from '../utils/dateUtils.js'
 
 const router = Router()
 
@@ -13,7 +13,7 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     let { fecha } = req.query
     if (!fecha) {
-      fecha = new Date().toISOString().split('T')[0]
+      fecha = getHoyLocal()
     }
 
     const asignaciones = await AsignacionRuta.findAll({
@@ -134,7 +134,7 @@ router.get('/historial', authMiddleware, async (req, res) => {
     } else if (mes) {
       const [anio, mesNum] = mes.split('-')
       const fechaInicio = `${anio}-${mesNum}-01`
-      const fechaFin = new Date(anio, mesNum, 0).toISOString().split('T')[0]
+      const fechaFin = formatLocalDate(new Date(parseInt(anio), parseInt(mesNum), 0))
       where.fecha = { [Op.between]: [fechaInicio, fechaFin] }
     }
 

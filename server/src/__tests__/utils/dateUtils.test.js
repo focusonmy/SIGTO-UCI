@@ -1,14 +1,19 @@
-import { expect, describe, it, vi, beforeEach, afterEach } from 'vitest'
-import { getRangoFechasValidas } from '../../utils/dateUtils.js'
+import { expect, describe, it, vi, afterEach } from 'vitest'
+import {
+  getRangoFechasValidas,
+  formatLocalDate,
+  getHoyLocal,
+  getMananaLocal
+} from '../../utils/dateUtils.js'
+
+function localDate(year, month, day, hour = 0, minute = 0) {
+  return new Date(year, month - 1, day, hour, minute)
+}
 
 describe('getRangoFechasValidas', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
-
-  function localDate(year, month, day) {
-    return new Date(year, month - 1, day)
-  }
 
   it('sabado: solo lunes es valido', () => {
     vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 5, 9) })
@@ -46,5 +51,72 @@ describe('getRangoFechasValidas', () => {
     const rango = getRangoFechasValidas()
     expect(rango.isValid('2026-05-16')).toBe(false)
     expect(rango.isValid('2026-05-17')).toBe(false)
+  })
+})
+
+describe('formatLocalDate', () => {
+  it('formatea con ceros a la izquierda', () => {
+    expect(formatLocalDate(localDate(2026, 3, 5))).toBe('2026-03-05')
+    expect(formatLocalDate(localDate(2026, 12, 31))).toBe('2026-12-31')
+    expect(formatLocalDate(localDate(2026, 1, 1))).toBe('2026-01-01')
+  })
+
+  it('usa la hora local, no UTC (regresion bug desfase)', () => {
+    expect(formatLocalDate(localDate(2026, 6, 4, 23, 59))).toBe('2026-06-04')
+    expect(formatLocalDate(localDate(2026, 6, 4, 0, 0))).toBe('2026-06-04')
+  })
+})
+
+describe('getHoyLocal', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('devuelve la fecha actual en formato YYYY-MM-DD', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 10, 0) })
+    expect(getHoyLocal()).toBe('2026-06-04')
+  })
+
+  it('regresion: a las 22:00 local sigue siendo el mismo dia (no desfasa por toISOString)', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 22, 0) })
+    expect(getHoyLocal()).toBe('2026-06-04')
+  })
+
+  it('regresion: a las 23:59 local sigue siendo el mismo dia', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 23, 59) })
+    expect(getHoyLocal()).toBe('2026-06-04')
+  })
+
+  it('cambia al dia siguiente despues de medianoche', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 0, 1) })
+    expect(getHoyLocal()).toBe('2026-06-04')
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 5, 0, 0) })
+    expect(getHoyLocal()).toBe('2026-06-05')
+  })
+})
+
+describe('getMananaLocal', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('suma un dia correctamente', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 10, 0) })
+    expect(getMananaLocal()).toBe('2026-06-05')
+  })
+
+  it('regresion: a las 22:00 devuelve el dia siguiente, no dos dias despues', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 4, 22, 0) })
+    expect(getMananaLocal()).toBe('2026-06-05')
+  })
+
+  it('cambia de mes correctamente', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 6, 30, 10, 0) })
+    expect(getMananaLocal()).toBe('2026-07-01')
+  })
+
+  it('cambia de ano correctamente', () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: localDate(2026, 12, 31, 10, 0) })
+    expect(getMananaLocal()).toBe('2027-01-01')
   })
 })

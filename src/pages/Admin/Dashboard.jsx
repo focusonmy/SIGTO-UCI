@@ -10,9 +10,70 @@ function formatDate(date) {
   return `${dayNames[date.getDay()]}, ${date.getDate()} de ${monthNames[date.getMonth()]} de ${date.getFullYear()}`
 }
 
+function ChevronIcon({ className }) {
+  return (
+    <svg className={className || 'w-4 h-4'} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  )
+}
+
+function FlotaRow({ label, count, color, bg, lista, expanded, onToggle, onFlotaClick }) {
+  const isEmpty = count === 0
+  const showChevron = !isEmpty
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ background: bg }}>
+      <button
+        type="button"
+        onClick={() => !isEmpty && onToggle()}
+        disabled={isEmpty}
+        className={`w-full flex items-center justify-between p-3 ${isEmpty ? 'cursor-default opacity-60' : 'cursor-pointer hover:brightness-95'} transition`}
+      >
+        <div className="flex items-center gap-3">
+          <span className="w-3 h-3 rounded-full" style={{ background: color }} />
+          <span style={{ color: '#0f172a' }}>{label}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold" style={{ color }}>{count}</span>
+          {showChevron && (
+            <span
+              className="transition-transform duration-200"
+              style={{ color: '#64748b', transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+            >
+              <ChevronIcon />
+            </span>
+          )}
+        </div>
+      </button>
+      {expanded && !isEmpty && (
+        <div className="px-3 pb-3 pt-1 space-y-1.5">
+          {lista.map(o => {
+            const marcaModelo = [o.marca, o.modelo].filter(Boolean).join(' ')
+            return (
+              <div
+                key={o.id}
+                onClick={() => onFlotaClick && onFlotaClick(o)}
+                className={`p-2.5 rounded-lg ${onFlotaClick ? 'cursor-pointer hover:brightness-95' : ''} transition`}
+                style={{ background: '#ffffff', border: '1px solid #e2e8f0' }}
+              >
+                <p className="font-semibold text-sm" style={{ color: '#0f172a' }}>{o.placa}</p>
+                {marcaModelo && (
+                  <p className="text-xs" style={{ color: '#64748b' }}>{marcaModelo}</p>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [rutas, setRutas] = useState([])
   const [choferes, setChoferes] = useState([])
+  const [flotaExpanded, setFlotaExpanded] = useState(null)
   const [omnibus, setOmnibus] = useState([])
   const [reporte, setReporte] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -52,7 +113,8 @@ export default function Dashboard() {
   }
 
   const esFinde = today.getDay() === 0 || today.getDay() === 6
-  const sinServicio = reporte?.mensaje && (reporte.mensaje.toLowerCase().includes('sábado') || reporte.mensaje.toLowerCase().includes('domingo'))
+  const sinServicio = !!reporte?.mensaje
+  const esManana = reporte?.tipo === 'manana'
 
   const garantizadasPct = stats.totalAsignaciones > 0 ? Math.round((stats.garantizadas / stats.totalAsignaciones) * 100) : 0
 
@@ -89,7 +151,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <div>
           <h2 className="text-2xl font-bold" style={{ color: '#0f172a' }}>Dashboard</h2>
-          <p className="text-sm" style={{ color: '#64748b' }}>{formatDate(today)}</p>
+          <p className="text-sm" style={{ color: '#64748b' }}>{reporte?.fecha || formatDate(today)}</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: '#f8fafc' }}>
           <span className={`w-2 h-2 rounded-full ${esFinde ? 'bg-orange-400' : 'bg-green-400'}`} />
@@ -138,13 +200,13 @@ export default function Dashboard() {
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold ${sinServicio ? 'bg-orange-400' : stats.pendientes === 0 ? 'bg-green-500' : 'bg-amber-500'}`}>
               {stats.garantizadas}
             </div>
-            <p className="text-sm font-medium" style={{ color: '#64748b' }}>Hoy</p>
+            <p className="text-sm font-medium" style={{ color: '#64748b' }}>{esManana ? 'Mañana' : 'Hoy'}</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: '#0f172a' }}>
             {sinServicio ? '—' : `${stats.garantizadas}/${stats.totalAsignaciones}`}
           </p>
           <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>
-            {sinServicio ? 'Sin servicio' : 'Rutas garantizadas'}
+            {sinServicio ? 'Sin servicio' : `Rutas garantizadas ${esManana ? 'mañana' : 'hoy'}`}
           </p>
         </div>
       </div>
@@ -152,7 +214,7 @@ export default function Dashboard() {
       {!esFinde && !sinServicio && stats.totalAsignaciones > 0 && (
         <div className="mb-6 p-5 rounded-2xl" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold" style={{ color: '#0f172a' }}>Estado de las rutas de hoy</h3>
+            <h3 className="font-semibold" style={{ color: '#0f172a' }}>Estado de las rutas {esManana ? 'de mañana' : 'de hoy'}</h3>
             <span className="text-sm" style={{ color: '#64748b' }}>{garantizadasPct}% completado</span>
           </div>
           <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: '#f1f5f9' }}>
@@ -182,7 +244,7 @@ export default function Dashboard() {
       {sinServicio && (
         <div className="mb-6 p-5 rounded-2xl" style={{ background: '#fef9c3' }}>
           <p className="font-medium" style={{ color: '#854d0e' }}>
-            {reporte?.mensaje || 'Hoy no hay servicio (fin de semana)'}
+            {reporte.mensaje}
           </p>
         </div>
       )}
@@ -212,27 +274,33 @@ export default function Dashboard() {
         <div className="p-5 rounded-2xl" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
           <h3 className="font-semibold mb-4" style={{ color: '#0f172a' }}>Flota de ómnibus</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: '#f0fdf4' }}>
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full" style={{ background: '#10b981' }} />
-                <span style={{ color: '#0f172a' }}>Disponibles</span>
-              </div>
-              <span className="font-bold" style={{ color: '#10b981' }}>{stats.disponibles}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: '#fff7ed' }}>
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full" style={{ background: '#f59e0b' }} />
-                <span style={{ color: '#0f172a' }}>En servicio</span>
-              </div>
-              <span className="font-bold" style={{ color: '#f59e0b' }}>{stats.enServicio}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: '#fef2f2' }}>
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full" style={{ background: '#ef4444' }} />
-                <span style={{ color: '#0f172a' }}>Mantenimiento</span>
-              </div>
-              <span className="font-bold" style={{ color: '#ef4444' }}>{stats.mantenimiento}</span>
-            </div>
+            <FlotaRow
+              label="Disponibles"
+              count={stats.disponibles}
+              color="#10b981"
+              bg="#f0fdf4"
+              lista={omnibus.filter(o => o.estado === 'disponible')}
+              expanded={flotaExpanded === 'disponibles'}
+              onToggle={() => setFlotaExpanded(flotaExpanded === 'disponibles' ? null : 'disponibles')}
+            />
+            <FlotaRow
+              label="En servicio"
+              count={stats.enServicio}
+              color="#f59e0b"
+              bg="#fff7ed"
+              lista={omnibus.filter(o => o.estado === 'en_servicio')}
+              expanded={flotaExpanded === 'en_servicio'}
+              onToggle={() => setFlotaExpanded(flotaExpanded === 'en_servicio' ? null : 'en_servicio')}
+            />
+            <FlotaRow
+              label="Mantenimiento"
+              count={stats.mantenimiento}
+              color="#ef4444"
+              bg="#fef2f2"
+              lista={omnibus.filter(o => o.estado === 'mantenimiento')}
+              expanded={flotaExpanded === 'mantenimiento'}
+              onToggle={() => setFlotaExpanded(flotaExpanded === 'mantenimiento' ? null : 'mantenimiento')}
+            />
             <div className="pt-2 text-center text-sm" style={{ color: '#94a3b8' }}>
               Total: {omnibus.length} unidades
             </div>

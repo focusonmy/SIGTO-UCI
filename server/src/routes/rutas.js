@@ -2,34 +2,10 @@ import { Router } from 'express'
 import { authMiddleware, roleMiddleware } from '../middleware/auth.js'
 import { Ruta, Chofer, Omnibus, AsignacionRuta } from '../models/index.js'
 import { isValidUUID, sanitizeString } from '../utils/validators.js'
+import { getMananaLocal, getFechaPorHora, formatearFechaDisplay } from '../utils/dateUtils.js'
 import logger from '../utils/logger.js'
 
 const router = Router()
-
-function formatearFechaDisplay(dateStr) {
-  const d = new Date(dateStr)
-  const dia = String(d.getDate()).padStart(2, '0')
-  const mes = String(d.getMonth() + 1).padStart(2, '0')
-  const anio = d.getFullYear()
-  return `${dia}/${mes}/${anio}`
-}
-
-function getFechaPorHora() {
-  const ahora = new Date()
-  const hora = ahora.getHours()
-  const min = ahora.getMinutes()
-  const enTarde = hora > 17 || (hora === 17 && min >= 15)
-  const fecha = new Date()
-  if (enTarde) fecha.setDate(fecha.getDate() + 1)
-  const fechaStr = fecha.toISOString().split('T')[0]
-  return {
-    fecha: fechaStr,
-    tipo: enTarde ? 'manana' : 'hoy',
-    label: enTarde
-      ? `Rutas para mañana ${formatearFechaDisplay(fechaStr)}`
-      : `Rutas para hoy ${formatearFechaDisplay(fechaStr)}`
-  }
-}
 
 function getHorarioLabel(hora) {
   if (!hora) return ''
@@ -140,9 +116,7 @@ router.get('/conductor-hoy', authMiddleware, async (req, res) => {
 
 router.get('/comunicado', authMiddleware, roleMiddleware('admin'), async (req, res) => {
   try {
-    const manana = new Date()
-    manana.setDate(manana.getDate() + 1)
-    const fechaManana = manana.toISOString().split('T')[0]
+    const fechaManana = getMananaLocal()
     const fechaDisplay = formatearFechaDisplay(fechaManana)
 
     const asignaciones = await AsignacionRuta.findAll({

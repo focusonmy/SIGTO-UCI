@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { authMiddleware, roleMiddleware } from '../middleware/auth.js'
 import { Ruta, Chofer, Omnibus, AsignacionRuta } from '../models/index.js'
+import { getFechaPorHora } from '../utils/dateUtils.js'
 import logger from '../utils/logger.js'
 
 const router = Router()
@@ -155,14 +156,19 @@ function procesarAsignaciones(asignaciones, fecha) {
 // GET /api/reportes/dia
 router.get('/dia', authMiddleware, roleMiddleware('admin'), async (req, res) => {
   try {
-    const hoy = new Date()
-    const fechaStr = hoy.toISOString().split('T')[0]
-    const diaSemana = hoy.getDay()
+    const { fecha: fechaStr, tipo } = getFechaPorHora()
+    const fechaObj = new Date(fechaStr + 'T00:00:00')
+    const diaSemana = fechaObj.getDay()
+    const hoyObj = new Date()
 
     if (diaSemana === 0 || diaSemana === 6) {
+      const mensaje = tipo === 'manana'
+        ? 'Mañana no hay servicio (sábado o domingo)'
+        : 'Hoy no hay servicio (sábado o domingo)'
       return res.json({
-        mensaje: 'Hoy no hay servicio (sábado o domingo)',
-        fecha: formatearFecha(hoy),
+        mensaje,
+        fecha: formatearFecha(fechaObj),
+        tipo,
         rutas: []
       })
     }
@@ -177,10 +183,11 @@ router.get('/dia', authMiddleware, roleMiddleware('admin'), async (req, res) => 
       order: [['hora', 'ASC']]
     })
 
-    const { rutas, garantizadas, pendientes, reporte_texto, total_rutas } = procesarAsignaciones(asignaciones, hoy)
+    const { rutas, garantizadas, pendientes, reporte_texto, total_rutas } = procesarAsignaciones(asignaciones, fechaObj)
 
     res.json({
-      fecha: formatearFecha(hoy),
+      fecha: formatearFecha(fechaObj),
+      tipo,
       dia: ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][diaSemana],
       total_rutas: total_rutas,
       garantizadas: garantizadas.length,
@@ -197,8 +204,8 @@ router.get('/dia', authMiddleware, roleMiddleware('admin'), async (req, res) => 
 // POST /api/reportes/copiar
 router.post('/copiar', authMiddleware, roleMiddleware('admin'), async (req, res) => {
   try {
-    const hoy = new Date()
-    const fechaStr = hoy.toISOString().split('T')[0]
+    const { fecha: fechaStr, tipo } = getFechaPorHora()
+    const fechaObj = new Date(fechaStr + 'T00:00:00')
 
     const asignaciones = await AsignacionRuta.findAll({
       where: { fecha: fechaStr },
@@ -210,9 +217,9 @@ router.post('/copiar', authMiddleware, roleMiddleware('admin'), async (req, res)
       order: [['hora', 'ASC']]
     })
 
-    const { reporte_texto } = procesarAsignaciones(asignaciones, hoy)
+    const { reporte_texto } = procesarAsignaciones(asignaciones, fechaObj)
 
-    res.json({ success: true, reporte: reporte_texto })
+    res.json({ success: true, reporte: reporte_texto, tipo, fecha: fechaStr })
   } catch (error) {
     logger.error('Error in POST /reportes/copiar:', error.message)
     res.status(500).json({ error: error.message })
