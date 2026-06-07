@@ -226,7 +226,11 @@ export default function Asignaciones() {
     const sortedOmnibus = [...omnibus].sort((a, b) => {
       const aOcc = ocupados.omnibus.includes(a.id)
       const bOcc = ocupados.omnibus.includes(b.id)
-      return aOcc === bOcc ? 0 : aOcc ? 1 : -1
+      const aAvail = a.estado === 'disponible'
+      const bAvail = b.estado === 'disponible'
+      if (aAvail !== bAvail) return aAvail ? -1 : 1
+      if (aOcc !== bOcc) return aOcc ? 1 : -1
+      return 0
     })
 
     if (excluded) {
@@ -290,9 +294,15 @@ export default function Asignaciones() {
             <option value="">Ómnibus...</option>
             {sortedOmnibus.map(o => {
               const occ = ocupados.omnibus.includes(o.id)
+              const notAvailable = o.estado !== 'disponible'
+              const disabled = occ || notAvailable
+              let suffix = ''
+              if (occ) suffix = ' (Ocupado)'
+              else if (o.estado === 'en_servicio') suffix = ' (En servicio)'
+              else if (o.estado === 'mantenimiento') suffix = ' (Mantenimiento)'
               return (
-                <option key={o.id} value={o.id} disabled={occ}>
-                  {o.placa}{occ ? ' (Ocupado)' : ''}
+                <option key={o.id} value={o.id} disabled={disabled}>
+                  {o.placa}{suffix}
                 </option>
               )
             })}
