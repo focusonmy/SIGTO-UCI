@@ -66,6 +66,7 @@ export default function Asignaciones() {
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' })
   const [errorFecha, setErrorFecha] = useState('')
+  const [autoCopy, setAutoCopy] = useState(true)
 
   useEffect(() => {
     loadChoferesOmnibus()
@@ -150,7 +151,7 @@ export default function Asignaciones() {
   function updateAsignacion(rutaId, hora, campo, valor) {
     setAsignaciones(prev => {
       let updated = applyUpdate(prev, rutaId, hora, campo, valor)
-      if (hora === '06:45') {
+      if (autoCopy && hora === '06:45') {
         updated = applyUpdate(updated, rutaId, '17:15', campo, valor)
       }
       asignacionesState = updated
@@ -388,6 +389,18 @@ export default function Asignaciones() {
               Solo se pueden asignar rutas para dias laborables (lunes a viernes)
             </p>
           )}
+          <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={autoCopy}
+              onChange={e => setAutoCopy(e.target.checked)}
+              className="w-4 h-4 rounded"
+              style={{ accentColor: '#2563eb' }}
+            />
+            <span className="text-xs" style={{ color: '#64748b' }}>
+              Copiar chofer y ómnibus a la tarde automáticamente
+            </span>
+          </label>
         </div>
         <div className="flex items-end">
           <button
