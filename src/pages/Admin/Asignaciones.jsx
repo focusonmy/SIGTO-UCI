@@ -188,6 +188,7 @@ export default function Asignaciones() {
           if (!existente) return
           if (existente.excluded) return
           asignacionesData.push({
+            id: existente.id,
             ruta_id: ruta.id,
             chofer_id: existente.chofer_id,
             omnibus_id: existente.omnibus_id,

@@ -31,6 +31,14 @@ async function request(endpoint, options = {}) {
       throw new Error('Sesión expirada')
     }
 
+    if (response.status === 409) {
+      const data = await response.json().catch(() => null)
+      const message = data?.conflictos?.join(' • ') || data?.warning || 'Conflicto detectado'
+      const err = new Error(message)
+      err.status = 409
+      throw err
+    }
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Error de conexión' }))
       throw new Error(error.error || 'Error de conexión')
