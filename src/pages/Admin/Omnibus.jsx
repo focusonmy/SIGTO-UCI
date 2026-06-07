@@ -175,8 +175,8 @@ export default function Omnibus() {
         </button>
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-        <div className="overflow-x-auto">
+        <div className="rounded-2xl" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead style={{ background: '#f8fafc' }}>
               <tr>

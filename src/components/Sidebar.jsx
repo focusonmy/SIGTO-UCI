@@ -149,83 +149,85 @@ export default function Sidebar() {
       />
 
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} style={{ background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}
+        <div className="flex flex-col min-h-full">
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}
+              >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">SIGTO UCI</h1>
+                <p className="text-xs" style={{ color: '#94a3b8' }}>Transporte Obrero</p>
+              </div>
+            </div>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto px-4 space-y-1">
+            {filteredNav.map(item => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 ${
+                    isActive ? 'text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`
+                }
+                style={({ isActive }) => isActive ? { background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' } : {}}
+              >
+                <item.icon />
+                <span className="font-medium">{item.label}</span>
+                {item.label === 'Rutas' && totalRutas !== null && (
+                  <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
+                    style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
+                    {totalRutas}
+                  </span>
+                )}
+                {item.label === 'Choferes' && totalChoferes !== null && (
+                  <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
+                    style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
+                    {totalChoferes}
+                  </span>
+                )}
+                {item.label === 'Ómnibus' && totalOmnibus !== null && (
+                  <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
+                    style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
+                    {totalOmnibus}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="p-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center gap-3 px-2 py-3 mb-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white"
+                style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}
+              >
+                {user?.nombre?.charAt(0)}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">{user?.nombre}</p>
+                <p className="text-xs" style={{ color: '#94a3b8' }}>{getRoleLabel(user?.role)}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-2.5 rounded-lg text-left transition-colors duration-200 hover:bg-white/5 hover:text-white text-gray-400 flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
             >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">SIGTO UCI</h1>
-              <p className="text-xs" style={{ color: '#94a3b8' }}>Transporte Obrero</p>
-            </div>
+              Cerrar Sesión
+            </button>
           </div>
-        </div>
-        
-        <nav className="px-4 space-y-1">
-          {filteredNav.map(item => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 ${
-                  isActive ? 'text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                }`
-              }
-              style={({ isActive }) => isActive ? { background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' } : {}}
-            >
-              <item.icon />
-              <span className="font-medium">{item.label}</span>
-              {item.label === 'Rutas' && totalRutas !== null && (
-                <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
-                  style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
-                  {totalRutas}
-                </span>
-              )}
-              {item.label === 'Choferes' && totalChoferes !== null && (
-                <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
-                  style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
-                  {totalChoferes}
-                </span>
-              )}
-              {item.label === 'Ómnibus' && totalOmnibus !== null && (
-                <span className="ml-auto px-2 py-0.5 text-xs rounded-full font-medium"
-                  style={{ background: 'rgba(255,255,255,0.15)', color: '#e2e8f0' }}>
-                  {totalOmnibus}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center gap-3 px-2 py-3 mb-3">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}
-            >
-              {user?.nombre?.charAt(0)}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white">{user?.nombre}</p>
-              <p className="text-xs" style={{ color: '#94a3b8' }}>{getRoleLabel(user?.role)}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2.5 rounded-lg text-left transition-colors duration-200 hover:bg-white/5 hover:text-white text-gray-400 flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Cerrar Sesión
-          </button>
         </div>
       </aside>
     </>
